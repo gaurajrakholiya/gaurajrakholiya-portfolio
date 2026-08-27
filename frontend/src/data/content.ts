@@ -18,8 +18,22 @@ export const CONTACT_API_REPO_URL = 'https://github.com/gaurajrakholiya/contact-
 /** Canonical origin. Update if the deployed domain differs. */
 export const SITE_URL = 'https://gaurajrakholiya.vercel.app';
 
+const rawApiBase = (import.meta.env.VITE_CONTACT_API_URL ?? '').trim().replace(/\/$/, '');
+
+// A scheme-less value like "api.example.com" is a *relative* URL: the browser
+// resolves it against the site's own origin, producing
+// https://this-site.vercel.app/api.example.com/resume. Nothing throws and no
+// request 404s until a visitor clicks, so this must fail the build instead —
+// the prerender step executes this module, which is what surfaces it.
+if (rawApiBase && !/^https?:\/\//.test(rawApiBase)) {
+  throw new Error(
+    `VITE_CONTACT_API_URL must start with http:// or https://. Got "${rawApiBase}" — ` +
+      `did you mean "https://${rawApiBase}"?`,
+  );
+}
+
 /** Base URL of the NestJS service, without a trailing slash. '' when unset. */
-export const API_BASE = (import.meta.env.VITE_CONTACT_API_URL ?? '').replace(/\/$/, '');
+export const API_BASE = rawApiBase;
 
 /**
  * Where "Download résumé" points.
