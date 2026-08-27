@@ -1,0 +1,16 @@
+node_modules/
+dist/
+dist-ssr/
+.vercel/
+*.tsbuildinfo
+.DS_Store
+
+# Local env files. .env.example is committed; real keys never are.
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+.claude/*
