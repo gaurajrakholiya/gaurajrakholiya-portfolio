@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Header,
   Post,
   Redirect,
   UploadedFile,
@@ -20,8 +21,13 @@ export class ResumeController {
    * The site's "Download résumé" link points here. It redirects to whichever
    * copy is current — the uploaded one, or the committed fallback — so the
    * link keeps working before the first upload and if blob storage is down.
+   *
+   * no-store because the target is a presigned URL that expires in minutes.
+   * A cached 302 would outlive its own destination and start serving a link
+   * that fails the signature check.
    */
   @Get()
+  @Header('Cache-Control', 'no-store')
   @Redirect()
   async download() {
     return { url: await this.resumeService.currentUrl(), statusCode: 302 };
