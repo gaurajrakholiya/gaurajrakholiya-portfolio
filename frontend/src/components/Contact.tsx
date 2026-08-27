@@ -46,7 +46,7 @@ export function Contact() {
         </Row>
       </div>
 
-      {/* {HAS_CONTACT_API ? (
+      {HAS_CONTACT_API ? (
         <>
           <ContactForm />
           <p className="mt-6 max-w-[58ch] font-mono text-2xs leading-relaxed text-graphite">
@@ -68,7 +68,7 @@ export function Contact() {
           No contact form here on purpose — a form that posts nowhere is worse than none. Email goes
           straight to me.
         </p>
-      )} */}
+      )}
     </div>
   );
 }
