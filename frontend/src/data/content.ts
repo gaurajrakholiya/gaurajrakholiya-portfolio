@@ -16,24 +16,42 @@ export const ORDERS_API_REPO_URL = 'https://github.com/gaurajrakholiya/order-ass
 export const CONTACT_API_REPO_URL = 'https://github.com/gaurajrakholiya/contact-api';
 
 /** Canonical origin. Update if the deployed domain differs. */
-export const SITE_URL = 'https://gaurajrakholiya.vercel.app';
+export const SITE_URL = 'https://gaurajrakholiya-portfolio-three.vercel.app';
 
-const rawApiBase = (import.meta.env.VITE_CONTACT_API_URL ?? '').trim().replace(/\/$/, '');
+/**
+ * A scheme-less value like "api.example.com" is a *relative* URL: the browser
+ * resolves it against the site's own origin, producing
+ * https://this-site.vercel.app/api.example.com/resume — a link that looks fine
+ * in the dashboard and only breaks when a visitor clicks it.
+ *
+ * Pasting a bare host is the natural mistake, because that is how Vercel
+ * displays a deployment. A bare host is only ever meant as https, so add the
+ * scheme rather than failing the build. Anything that still will not parse as a
+ * URL is a real misconfiguration and throws — the prerender step executes this
+ * module, so that surfaces at build time rather than in front of a visitor.
+ */
+function normaliseApiBase(raw: string): string {
+  const trimmed = raw.trim().replace(/\/+$/, '');
+  if (!trimmed) return '';
 
-// A scheme-less value like "api.example.com" is a *relative* URL: the browser
-// resolves it against the site's own origin, producing
-// https://this-site.vercel.app/api.example.com/resume. Nothing throws and no
-// request 404s until a visitor clicks, so this must fail the build instead —
-// the prerender step executes this module, which is what surfaces it.
-if (rawApiBase && !/^https?:\/\//.test(rawApiBase)) {
-  throw new Error(
-    `VITE_CONTACT_API_URL must start with http:// or https://. Got "${rawApiBase}" — ` +
-      `did you mean "https://${rawApiBase}"?`,
-  );
+  const candidate = /^https?:\/\//.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+  let url: URL;
+  try {
+    url = new URL(candidate);
+  } catch {
+    throw new Error(
+      `VITE_CONTACT_API_URL is not a usable URL: "${raw}". ` +
+        `Expected an origin such as https://your-api.vercel.app`,
+    );
+  }
+
+  // Keep any sub-path, drop the trailing slash `new URL` leaves on a bare origin.
+  return `${url.origin}${url.pathname.replace(/\/+$/, '')}`;
 }
 
 /** Base URL of the NestJS service, without a trailing slash. '' when unset. */
-export const API_BASE = rawApiBase;
+export const API_BASE = normaliseApiBase(import.meta.env.VITE_CONTACT_API_URL ?? '');
 
 /**
  * Where "Download résumé" points.

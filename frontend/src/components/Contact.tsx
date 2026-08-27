@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { CONTACT_API_REPO_URL, PROFILE } from '../data/content';
+import { API_BASE, CONTACT_API_REPO_URL, PROFILE } from '../data/content';
 import { ContactForm } from './ContactForm';
 
-const HAS_CONTACT_API = Boolean(import.meta.env.VITE_CONTACT_API_URL);
+const HAS_CONTACT_API = Boolean(API_BASE);
 
 export function Contact() {
   return (

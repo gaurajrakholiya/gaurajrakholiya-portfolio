@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent, InputHTMLAttributes } from 'react';
-import { PROFILE } from '../data/content';
+import { API_BASE, PROFILE } from '../data/content';
 
 /**
  * Rendered only when VITE_CONTACT_API_URL is set at build time — see Contact.tsx.
@@ -15,7 +15,9 @@ type Status =
   | { kind: 'sent' }
   | { kind: 'failed'; reason: string };
 
-const API_URL = import.meta.env.VITE_CONTACT_API_URL as string;
+// API_BASE, not the raw env var: a value pasted without a scheme would make
+// this fetch a same-origin path on the site itself rather than the API.
+const API_URL = API_BASE;
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
@@ -31,7 +33,7 @@ export function ContactForm() {
     setStatus({ kind: 'submitting' });
 
     try {
-      const response = await fetch(`${API_URL.replace(/\/$/, '')}/contact`, {
+      const response = await fetch(`${API_URL}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
